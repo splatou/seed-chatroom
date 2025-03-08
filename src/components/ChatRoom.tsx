@@ -26,6 +26,7 @@ const ChatRoom: React.FC<ChatRoomProps> = ({ isAdmin = false }) => {
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const inputRef = useRef<HTMLInputElement>(null);
 
   // Load username from localStorage on initial render
   useEffect(() => {
@@ -70,6 +71,13 @@ const ChatRoom: React.FC<ChatRoomProps> = ({ isAdmin = false }) => {
     scrollToBottom();
   }, [messages]);
 
+  // Focus on input when username modal closes
+  useEffect(() => {
+    if (!showUsernameModal && inputRef.current) {
+      inputRef.current.focus();
+    }
+  }, [showUsernameModal]);
+
   const fetchMessages = async () => {
     try {
       setLoading(true);
@@ -96,10 +104,12 @@ const ChatRoom: React.FC<ChatRoomProps> = ({ isAdmin = false }) => {
     }
   };
 
-  const handleSendMessage = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const handleSendMessage = async (e?: React.FormEvent) => {
+    if (e) {
+      e.preventDefault();
+    }
     
-    if (!newMessage.trim()) return;
+    if (!newMessage.trim() || loading) return;
     
     try {
       setLoading(true);
@@ -118,12 +128,24 @@ const ChatRoom: React.FC<ChatRoomProps> = ({ isAdmin = false }) => {
         console.log('Message sent successfully');
         setNewMessage('');
         setErrorMessage(null);
+        
+        // Refocus the input field after sending
+        if (inputRef.current) {
+          inputRef.current.focus();
+        }
       }
     } catch (err) {
       console.error('Failed to send message:', err);
       setErrorMessage('An unexpected error occurred while sending your message.');
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault();
+      handleSendMessage();
     }
   };
 
@@ -271,12 +293,16 @@ const ChatRoom: React.FC<ChatRoomProps> = ({ isAdmin = false }) => {
       <form onSubmit={handleSendMessage} className="message-form">
         <div className="input-container">
           <input
+            ref={inputRef}
             type="text"
             value={newMessage}
             onChange={(e) => setNewMessage(e.target.value)}
+            onKeyDown={handleKeyDown}
             placeholder="Share your activities or location..."
             className="message-input"
             disabled={loading}
+            autoComplete="off"
+            aria-label="Message"
           />
           <button
             type="submit"
@@ -308,6 +334,7 @@ const ChatRoom: React.FC<ChatRoomProps> = ({ isAdmin = false }) => {
                 onChange={(e) => setUsername(e.target.value)}
                 placeholder="Your name"
                 className="form-input"
+                autoComplete="off"
               />
               <button
                 type="submit"

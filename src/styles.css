@@ -235,7 +235,8 @@
     opacity: 0.7;
     cursor: not-allowed;
   }
-
+  
+  /* Additional styles for saved username functionality */
   .header-controls {
     display: flex;
     gap: 8px;
@@ -262,4 +263,66 @@
     border-radius: 4px;
     margin-left: 16px;
     border-left: 2px solid #666;
+  }
+  
+  /* Mobile responsiveness improvements */
+  @media (max-width: 768px) {
+    .header {
+      padding: 12px;
+      flex-wrap: wrap;
+    }
+    
+    .logo-image {
+      width: 120px;
+    }
+    
+    .header-controls {
+      margin-top: 8px;
+    }
+    
+    .message-form {
+      padding: 12px;
+    }
+    
+    .input-container {
+      flex-wrap: nowrap;
+    }
+    
+    .message-input {
+      font-size: 16px; /* Prevents iOS zoom on input */
+      padding: 10px 12px;
+    }
+    
+    .send-button {
+      white-space: nowrap;
+      padding: 10px 16px;
+      font-size: 14px;
+    }
+    
+    .modal-content {
+      width: 90%;
+      max-width: 320px;
+      padding: 16px;
+    }
+    
+    .admin-button, 
+    .logout-button {
+      font-size: 11px;
+    }
+    
+    .messages-container {
+      padding: 12px;
+    }
+  }
+  
+  /* Fix for iOS/mobile virtual keyboard issues */
+  html, body, #root, .chat-container {
+    height: 100%;
+    position: fixed;
+    overflow: hidden;
+    width: 100%;
+  }
+  
+  .messages-container {
+    -webkit-overflow-scrolling: touch;
   }
